@@ -3,7 +3,9 @@ package jm.task.core.jdbc.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Collection;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -16,8 +18,9 @@ public class Util {
 
     private static Optional<Connection> Connecting() throws ClassNotFoundException, SQLException {
         Class.forName("jm.task.mysql.Driver");
-        return Optional.ofNullable(
+        connection = Optional.ofNullable(
                 DriverManager.getConnection(dataBaseHost, dataBaseLogin, dataBasePassword));
+        return connection;
     }
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
