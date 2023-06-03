@@ -3,6 +3,7 @@ package jm.task.core.jdbc.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -19,7 +20,7 @@ public class Util {
                 DriverManager.getConnection(dataBaseHost, dataBaseLogin, dataBasePassword));
     }
 
-    public static Optional<Connection> getConnection() throws ClassNotFoundException, SQLException {
-        return connection.isPresent() ? connection : Connecting();
+    public static Connection getConnection() throws ClassNotFoundException, SQLException {
+        return connection.isPresent() ? connection.get() : Connecting().orElse(null);
     }
 }
