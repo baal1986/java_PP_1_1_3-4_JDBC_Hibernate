@@ -8,10 +8,8 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
         try {
-            Util util = new Util();
-            System.out.println(util.toString());
-            System.out.printf(String.valueOf(util.getConnection().isClosed()));
-        } catch (ClassNotFoundException | SQLException | IOException ignored) {
+            System.out.printf(String.valueOf(new Util().getConnection().isClosed()));
+        } catch (ClassNotFoundException | SQLException | RuntimeException | IOException ignored) {
             System.out.printf(String.valueOf(ignored.fillInStackTrace()));
         }
 

@@ -12,43 +12,37 @@ import java.util.Properties;
 
 
 public class Util {
+
     private static final Properties properties = new Properties();
-    private static String dataBaseDriver = properties.getProperty("db.driver");
-    private static String dataBaseHost = properties.getProperty("db.host");
-    private static String dataBaseLogin = properties.getProperty("db.login");
-    private static String dataBasePassword = properties.getProperty("db.password");
+    private static String dataBaseDriver;
+    private static String dataBaseHost;
+    private static String dataBaseLogin;
+    private static String dataBasePassword;
     private static Optional<Connection> connection;
 
-    public Util() throws IOException {
+    public Util() throws SQLException, ClassNotFoundException, IOException {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("database.properties")) {
-
             if (inputStream != null) {
                 properties.load(inputStream);
             } else {
                 throw new FileNotFoundException();
             }
-
             dataBaseDriver = properties.getProperty("db.driver");
             dataBaseHost = properties.getProperty("db.host");
             dataBaseLogin = properties.getProperty("db.login");
             dataBasePassword = properties.getProperty("db.password");
         }
+        Connecting();
     }
 
     private Optional<Connection> Connecting() throws ClassNotFoundException, SQLException {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        connection = Optional.ofNullable(
+        Class.forName(dataBaseDriver);
+        return connection = Optional.ofNullable(
                 DriverManager.getConnection(dataBaseHost, dataBaseLogin, dataBasePassword));
-        return connection;
     }
 
-    public Connection getConnection() throws ClassNotFoundException, SQLException {
-        Connecting();
+    public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
         return connection.isPresent() ? connection.get() : Connecting().orElse(null);
     }
 
-    @Override
-    public String toString() {
-        return dataBaseDriver + " " + dataBaseHost + " " + dataBaseLogin + " " + dataBasePassword;
-    }
 }
