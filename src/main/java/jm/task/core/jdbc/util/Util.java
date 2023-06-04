@@ -3,11 +3,9 @@ package jm.task.core.jdbc.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 public class Util {
     private static final Properties properties = new Properties();
@@ -17,13 +15,19 @@ public class Util {
     private static Optional<Connection> connection;
 
     private static Optional<Connection> Connecting() throws ClassNotFoundException, SQLException {
-        Class.forName("jm.task.mysql.Driver");
+        Class.forName("com.mysql.cj.jdbc.Driver");
         connection = Optional.ofNullable(
                 DriverManager.getConnection(dataBaseHost, dataBaseLogin, dataBasePassword));
         return connection;
     }
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
+        Connecting();
         return connection.isPresent() ? connection.get() : Connecting().orElse(null);
+    }
+
+    @Override
+    public  String toString() {
+        return dataBaseHost + " " + dataBaseLogin + " " + dataBasePassword;
     }
 }
