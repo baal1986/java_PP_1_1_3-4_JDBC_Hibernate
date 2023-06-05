@@ -14,7 +14,6 @@ import java.util.Properties;
 public class Util {
 
     private static final Properties properties = new Properties();
-    private static String dataBaseDriver;
     private static String dataBaseHost;
     private static String dataBaseLogin;
     private static String dataBasePassword;
@@ -27,7 +26,6 @@ public class Util {
             } else {
                 throw new FileNotFoundException();
             }
-            dataBaseDriver = properties.getProperty("db.driver");
             dataBaseHost = properties.getProperty("db.host");
             dataBaseLogin = properties.getProperty("db.login");
             dataBasePassword = properties.getProperty("db.password");
@@ -35,13 +33,13 @@ public class Util {
         Connecting();
     }
 
-    private Optional<Connection> Connecting() throws ClassNotFoundException, SQLException {
-        Class.forName(dataBaseDriver);
+    private Optional<Connection> Connecting() throws SQLException {
         return connection = Optional.ofNullable(
-                DriverManager.getConnection(dataBaseHost, dataBaseLogin, dataBasePassword));
+                DriverManager.getConnection(dataBaseHost, dataBaseLogin, dataBasePassword)
+        );
     }
 
-    public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
+    public Connection getConnection() throws SQLException, IOException {
         return connection.isPresent() ? connection.get() : Connecting().orElse(null);
     }
 

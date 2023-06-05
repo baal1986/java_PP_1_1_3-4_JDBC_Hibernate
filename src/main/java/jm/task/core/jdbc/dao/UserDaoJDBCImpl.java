@@ -5,10 +5,7 @@ import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +22,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-    private Statement statement;
-    private ResultSet resultSet;
+    private PreparedStatement statement;
 
 
     public UserDaoJDBCImpl() {
@@ -35,36 +31,89 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-        //"CREATE TABLE if not exists Grocery_bill (Employee_Id INT, Employee_name VARCHAR(50));"
         try {
-            statement = dbConnection.createStatement();
-            statement.executeUpdate(
-                    "CREATE TABLE if not exists Users" +
-                            " (User, Employee_name VARCHAR(50))"
+            statement = dbConnection.prepareStatement(
+                    "CREATE TABLE IF NOT EXISTS users(" +
+                            "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                            "name VARCHAR(250) NOT NULL," +
+                            "lastName VARCHAR(250) NOT NULL," +
+                            "age INT(250) NOT NULL);"
             );
-
+            dbConnection.setAutoCommit(false);
+            statement.execute();
+            dbConnection.commit();
         } catch (SQLException sqlException) {
+            try {
+                dbConnection.rollback();
+            } catch (SQLException sqlExceptionTransaction) {
+                sqlExceptionTransaction.printStackTrace();
+            }
             sqlException.printStackTrace();
         }
     }
 
     public void dropUsersTable() {
-
+        try {
+            statement = dbConnection.prepareStatement(
+                    "DROP TABLE IF EXISTS users CASCADE;"
+            );
+            dbConnection.setAutoCommit(false);
+            statement.execute();
+            dbConnection.commit();
+        } catch (SQLException sqlException) {
+            try {
+                dbConnection.rollback();
+            } catch (SQLException sqlExceptionTransaction) {
+                sqlExceptionTransaction.printStackTrace();
+            }
+            sqlException.printStackTrace();
+        }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-
+        try {
+            statement = dbConnection.prepareStatement(
+                    "INSERT INTO users(name, lastname, age) VALUES (?,?,?);"
+            );
+            statement.setString(1, name);
+            statement.setString(2, lastName);
+            statement.setInt(3, age);
+            dbConnection.setAutoCommit(false);
+            statement.executeUpdate();
+            dbConnection.commit();
+        } catch (SQLException sqlException) {
+            try {
+                dbConnection.rollback();
+            } catch (SQLException sqlExceptionTransaction) {
+                sqlExceptionTransaction.printStackTrace();
+            }
+            sqlException.printStackTrace();
+        }
     }
 
     public void removeUserById(long id) {
-
+        try {
+            statement = dbConnection.prepareStatement(
+                    "DELETE FROM users WHERE id=?;"
+            );
+            statement.setLong(1, id);
+            dbConnection.setAutoCommit(false);
+            statement.execute();
+            dbConnection.commit();
+        } catch (SQLException sqlException) {
+            try {
+                dbConnection.rollback();
+            } catch (SQLException sqlExceptionTransaction) {
+                sqlExceptionTransaction.printStackTrace();
+            }
+            sqlException.printStackTrace();
+        }
     }
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         try {
-            statement = dbConnection.createStatement();
-            resultSet = statement.executeQuery("SELECT id, name, lastName,age FROM Users");
+            ResultSet resultSet = statement.executeQuery("SELECT id, name, lastName,age FROM users");
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -80,6 +129,20 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-
+        try {
+            statement = dbConnection.prepareStatement(
+                    "DELETE FROM users;"
+            );
+            dbConnection.setAutoCommit(false);
+            statement.execute();
+            dbConnection.commit();
+        } catch (SQLException sqlException) {
+            try {
+                dbConnection.rollback();
+            } catch (SQLException sqlExceptionTransaction) {
+                sqlExceptionTransaction.printStackTrace();
+            }
+            sqlException.printStackTrace();
+        }
     }
 }
