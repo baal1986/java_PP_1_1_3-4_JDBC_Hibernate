@@ -12,22 +12,16 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
 
-    private static Connection dbConnection;
+    private Connection dbConnection;
+    private PreparedStatement statement;
 
-    static {
+
+    public UserDaoJDBCImpl() {
         try {
             dbConnection = new Util().getConnection();
         } catch (ClassNotFoundException | SQLException | IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private PreparedStatement statement;
-
-
-    public UserDaoJDBCImpl() {
-
-
     }
 
     public void createUsersTable() {
@@ -37,7 +31,7 @@ public class UserDaoJDBCImpl implements UserDao {
                             "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                             "name VARCHAR(250) NOT NULL," +
                             "lastName VARCHAR(250) NOT NULL," +
-                            "age INT(250) NOT NULL);"
+                            "age TINYINT UNSIGNED NOT NULL);"
             );
             dbConnection.setAutoCommit(false);
             statement.execute();
@@ -77,7 +71,7 @@ public class UserDaoJDBCImpl implements UserDao {
             );
             statement.setString(1, name);
             statement.setString(2, lastName);
-            statement.setInt(3, age);
+            statement.setByte(3, age);
             dbConnection.setAutoCommit(false);
             statement.executeUpdate();
             dbConnection.commit();
@@ -113,7 +107,6 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         try {
-            dbConnection.setAutoCommit(false);
             ResultSet resultSet = statement.executeQuery("SELECT id, name, lastName,age FROM users");
             while (resultSet.next()) {
                 User user = new User();
@@ -122,15 +115,8 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setLastName(resultSet.getString("lastName"));
                 user.setAge(resultSet.getByte("age"));
                 users.add(user);
-
             }
-            dbConnection.commit();
         } catch (SQLException sqlException) {
-            try {
-                dbConnection.rollback();
-            } catch (SQLException sqlExceptionTransaction) {
-                sqlExceptionTransaction.printStackTrace();
-            }
             sqlException.printStackTrace();
         }
         return users;
