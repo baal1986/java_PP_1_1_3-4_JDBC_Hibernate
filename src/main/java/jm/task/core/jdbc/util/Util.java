@@ -1,6 +1,10 @@
 package jm.task.core.jdbc.util;
 
 
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +22,10 @@ public class Util {
     private static String dataBaseLogin;
     private static String dataBasePassword;
     private static Optional<Connection> connection;
+    private static SessionFactory sessionFactory;
 
-    public Util() throws SQLException, ClassNotFoundException, IOException {
+
+    public Util() throws SQLException, ClassNotFoundException, HibernateException, IOException {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("database.properties")) {
             if (inputStream != null) {
                 properties.load(inputStream);
@@ -31,6 +37,16 @@ public class Util {
             dataBasePassword = properties.getProperty("db.password");
         }
         Connecting();
+
+        properties.clear();
+        ClassLoader classLoader = getClass().getClassLoader();
+        //Properties properties = new Properties();
+        properties.load(classLoader.getResourceAsStream("hibernate.properties"));
+        sessionFactory = new Configuration()
+                .addProperties(properties)
+                .configure()
+                .addAnnotatedClass(jm.task.core.jdbc.model.User.class)
+                .buildSessionFactory();
     }
 
     private Optional<Connection> Connecting() throws SQLException {
@@ -43,4 +59,7 @@ public class Util {
         return connection.isPresent() ? connection.get() : Connecting().orElse(null);
     }
 
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
 }
