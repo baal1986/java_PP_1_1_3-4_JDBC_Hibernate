@@ -49,8 +49,9 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
 
-            session.createSQLQuery("DROP TABLE IF EXISTS users CASCADE;")
-                    .addEntity(User.class)
+            session.createSQLQuery(
+                            "DROP TABLE IF EXISTS users CASCADE;"
+                    ).addEntity(User.class)
                     .executeUpdate();
 
             session.getTransaction().commit();
@@ -61,23 +62,58 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
 
+            session.save(new User(name, lastName, age));
+
+            session.getTransaction().commit();
+        } catch (HibernateException hibernateException) {
+            hibernateException.printStackTrace();
+        }
     }
 
     @Override
     public void removeUserById(long id) {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
 
+            User user = session.get(User.class, id);
+            session.delete(user);
+
+            session.getTransaction().commit();
+        } catch (HibernateException hibernateException) {
+            hibernateException.printStackTrace();
+        }
     }
 
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
 
+            users = session.createQuery("FROM User")
+                    .getResultList();
+
+            session.getTransaction().commit();
+        } catch (HibernateException hibernateException) {
+            hibernateException.printStackTrace();
+        }
         return users;
     }
 
     @Override
     public void cleanUsersTable() {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
 
+            session.createQuery("DELETE User")
+                    .executeUpdate();
+
+            session.getTransaction().commit();
+        } catch (HibernateException hibernateException) {
+            hibernateException.printStackTrace();
+        }
     }
 }
