@@ -40,11 +40,9 @@ public class Util {
 
         properties.clear();
         ClassLoader classLoader = getClass().getClassLoader();
-        //Properties properties = new Properties();
         properties.load(classLoader.getResourceAsStream("hibernate.properties"));
         sessionFactory = new Configuration()
                 .addProperties(properties)
-                .configure()
                 .addAnnotatedClass(jm.task.core.jdbc.model.User.class)
                 .buildSessionFactory();
     }
@@ -59,7 +57,7 @@ public class Util {
         return connection.isPresent() ? connection.get() : Connecting().orElse(null);
     }
 
-    public static SessionFactory getSessionFactory() {
+    public SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }
