@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserDaoHibernateImpl implements UserDao {
 
@@ -41,7 +42,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
             transaction.commit();
         } catch (HibernateException hibernateException) {
-            transaction.rollback();
+            try {
+                transaction.rollback();
+            } catch (HibernateException rollbackHibernateException) {
+                rollbackHibernateException.printStackTrace();
+            }
             hibernateException.printStackTrace();
         }
     }
@@ -58,7 +63,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
             transaction.commit();
         } catch (HibernateException hibernateException) {
-            transaction.rollback();
+            try {
+                transaction.rollback();
+            } catch (HibernateException rollbackHibernateException) {
+                rollbackHibernateException.printStackTrace();
+            }
             hibernateException.printStackTrace();
         }
     }
@@ -72,7 +81,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
             transaction.commit();
         } catch (HibernateException hibernateException) {
-            transaction.rollback();
+            try {
+                transaction.rollback();
+            } catch (HibernateException rollbackHibernateException) {
+                rollbackHibernateException.printStackTrace();
+            }
             hibernateException.printStackTrace();
         }
     }
@@ -82,12 +95,15 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
-            User user = session.get(User.class, id);
-            session.delete(user);
+            session.delete(session.get(User.class, id));
 
             transaction.commit();
         } catch (HibernateException hibernateException) {
-            transaction.rollback();
+            try {
+                transaction.rollback();
+            } catch (HibernateException rollbackHibernateException) {
+                rollbackHibernateException.printStackTrace();
+            }
             hibernateException.printStackTrace();
         }
     }
@@ -103,7 +119,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
             transaction.commit();
         } catch (HibernateException hibernateException) {
-            transaction.rollback();
+            try {
+                transaction.rollback();
+            } catch (HibernateException rollbackHibernateException) {
+                rollbackHibernateException.printStackTrace();
+            }
             hibernateException.printStackTrace();
         }
         return users;
@@ -119,7 +139,11 @@ public class UserDaoHibernateImpl implements UserDao {
 
             transaction.commit();
         } catch (HibernateException hibernateException) {
-            transaction.rollback();
+            try {
+                transaction.rollback();
+            } catch (HibernateException rollbackHibernateException) {
+                rollbackHibernateException.printStackTrace();
+            }
             hibernateException.printStackTrace();
         }
     }
