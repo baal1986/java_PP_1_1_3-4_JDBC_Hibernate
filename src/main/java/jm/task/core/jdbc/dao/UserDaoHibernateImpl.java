@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 public class UserDaoHibernateImpl implements UserDao {
 
@@ -31,6 +31,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public void createUsersTable() {
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
+
             session.createSQLQuery(
                             "CREATE TABLE IF NOT EXISTS users(" +
                                     "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
@@ -77,11 +78,7 @@ public class UserDaoHibernateImpl implements UserDao {
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
 
-            User user = new User();
-            user.setName(name);
-            user.setLastName(lastName);
-            user.setAge(age);
-            session.save(user);
+            session.save(new User(name, lastName, age));
 
             transaction.commit();
         } catch (HibernateException hibernateException) {
@@ -116,18 +113,11 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
 
-            users = session.createQuery("FROM User")
+            users = session.createQuery("FROM User", User.class)
                     .getResultList();
 
-            transaction.commit();
         } catch (HibernateException hibernateException) {
-            try {
-                transaction.rollback();
-            } catch (HibernateException rollbackHibernateException) {
-                rollbackHibernateException.printStackTrace();
-            }
             hibernateException.printStackTrace();
         }
         return users;
